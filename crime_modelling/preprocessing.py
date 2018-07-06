@@ -20,7 +20,8 @@ def preprocess(file, id_col, time_col, coords_cols, feature_cols, type_col, date
     id_frame = np.array(crime[id_col])
     time_frame = setup_time_frame(crime[time_col])
     coord_frame = np.array(crime[coords_cols])
-    feature_frame = np.array(crime[feature_cols])
+    if feature_cols != "": feature_frame = np.array(crime[feature_cols])
+    else: feature_frame = ""
     type_frame = np.array(crime[type_col])
     dataset_obj = SpatialDataSet(id_frame, time_frame, coord_frame, feature_frame, 
         type_frame, date_format, uniform_areas, spatial_unit_areas)
@@ -28,6 +29,11 @@ def preprocess(file, id_col, time_col, coords_cols, feature_cols, type_col, date
 
 def main():
     parser = argparse.ArgumentParser(description = "Mellon Grant preprocessing module\n\n" +
+                                     "This module takes in a csv as an input and produces a data structure of" +
+                                     "class SpatialDataSet to use in the prediction module. NOTE: The prediction" + 
+                                     "module is designed to specifically work with the SpatialDataSet class, so this"+
+                                     "step is necessary before moving on to later modules. The output of this module" +
+                                     "will be an hdf5 file containing the SpatialDataSet object.\n\n"
                                      "Input file should be comma-delimited with the following columns:\n\n"+
                                      "id_col - Column that provides the spatial ID coordinates of each data point.\n\n"+
                                      "time_col - Column that provides date and time of data point.\n\n" + 
@@ -41,19 +47,17 @@ def main():
                                      "should correspond to the rows of the input file.", formatter_class=argparse.RawTextHelpFormatter)
     required = parser.add_argument_group('required arguments')
     required.add_argument("-input_file", help = "Name of file containing data points")
-    required.add_argument("-id_col", help = "Spatial ID Column")
-    required.add_argument("-time_col", help = "Time Events Column")
-    required.add_argument("-coords_cols", help = "Coordinate Columns: First column is X, second Y")
+    required.add_argument("-id_col", nargs = 1, help = "Spatial ID Column")
+    required.add_argument("-time_col",nargs = 1, help = "Time Events Column")
+    required.add_argument("-coords_cols", nargs = 2, help = "Coordinate Columns: First column is X, second Y")
     
-    parser.add_argument("-feature_cols", help = "Any Additional Features Column", default = "")
+    parser.add_argument("-feature_cols", nargs = "*", help = "Any Additional Features Column", default = "")
     
-    required.add_argument("-type_col", help = "Crime Type Column")
-    parser.add_argument("-date_format", help = "Date format in Time Column", default = "%Y/%m/%d")
+    required.add_argument("-type_col", nargs = 1, help = "Crime Type Column")
+    parser.add_argument("-date_format", nargs = 1, help = "Date format in Time Column", default = "%Y/%m/%d")
     
     parser.add_argument("-uniform_areas", help ="Boolean indicating if grid sizes are uniform", default = True)
-    parser.add_argument("-spatial_unit_areas", help = "Area of spatial units", default = 250000)
-    
-    args = parser.parse_args()
+    parser.add_argument("-spatial_unit_areas", nargs = "*", help = "Area of spatial units", default = 250000)
     
     # Parse arguments and check for required args.
     args = parser.parse_args()
@@ -71,16 +75,17 @@ def main():
         return
     if not args.type_col:
         print("type_col argument must be provided.")
+        return   
+    if args.uniform_areas and type(args.spatial_unit_areas) != int:
+        print("uniform_areas set to True but spatial_unit_areas is not an integer. Set uniform_areas = False or provide an integer.")
+        return
+    if not args.uniform_areas and type(args.spatial_unit_areas) == int:
+        print("uniform_areas set to False but spatial_unit_areas is an integer. Set uniform_areas = True or provider an array of integers.")
         return
     
-    if args.uniform_areas and type(args.spatial_unit_areas) != "int":
-        print("uniform_areas set to True but spatial_unit_areas is not an integer. Set uniform_areas = False or provide an integer.")
-        print
-    if not args.uniform_areas and type(args.spatial_unit_areas) == "int":
-        print("uniform_areas set to False but spatial_unit_areas is an integer. Set uniform_areas = True or provider an array of integers.")
-    
-    return preprocess(args.input_file, args.id_col, args.time_col, args.coords_cols, args.feature_cols,
+    file = preprocess(args.input_file, args.id_col, args.time_col, args.coords_cols, args.feature_cols,
                       args.type_col, args.date_format, args.uniform_areas, args.spatial_unit_areas)
+    return file.export()
     
 if __name__ == "__main__":
     main()
@@ -89,4 +94,5 @@ if __name__ == "__main__":
 #note: all args need to be in the form of arrays
 #preprocess("aprs_5years.csv", ["Grid500ID"], ["DATE_START"], ["Grid500X", "Grid500Y"],
 #["ARREST_FLAG", "VICTIMS", "SUSPECTS"], ["HIERARCHY"])
-
+#example usage:
+   # python3 preprocessing.py  -input_file aprs_5years.csv -id_col 'Grid500ID' -time_col 'DATE_START' -coords_cols 'Grid500X', 'Grid500Y' -type_col 'HIERARCHY'

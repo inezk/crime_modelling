@@ -1,5 +1,5 @@
 import numpy as np
-import h5py
+import pickle
 
 #don't assume type_col included in feature_cols 
 
@@ -17,7 +17,6 @@ class SpatialDataSet(object):
     def make_feature_frame(self, id_col, time_col, type_col, coords_cols): #output is 3-d numpy array
         id_dict = dict() 
         id_row = 0
-        type_col = np.array(type_col)
         all_weeks = np.unique(time_col)
         unique_id = np.unique(id_col) #spatial IDs
         unique_types = np.unique(type_col)
@@ -49,12 +48,16 @@ class SpatialDataSet(object):
         return(time[0, 0], time[len(time) - 1, 0])
 
     def view(self, id_cols, time_cols, coord_cols, type_col, feature_cols): #view in presentable format
-        whole_frame = np.concatenate((id_cols.astype(object), time_cols.astype(object), coord_cols.astype(object),
-            type_col.astype(object), feature_cols.astype(object)), axis = 1)
+        if feature_cols != "":
+            whole_frame = np.concatenate((id_cols.astype(object), time_cols.astype(object), coord_cols.astype(object),
+                type_col.astype(object), feature_cols), axis = 1)
+        else:
+             whole_frame = np.concatenate((id_cols.astype(object), time_cols.astype(object), coord_cols.astype(object),
+                type_col.astype(object)), axis = 1)
         return whole_frame
 
     def export(self): #save to csv file
-        hf = h5py.File("preprocessed_data.h5", "w")
-        hf.create_dataset("SDS", data = self)
-        hf.close()
+        file = open("processed_data.obj", "wb")
+        pickle.dump(self, file)
+        file.close()
 
