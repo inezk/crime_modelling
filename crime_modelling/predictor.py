@@ -69,7 +69,8 @@ def main():
         mov_avg = moving_average.moving_average(dataset, args.time_window, args.crime_types)
         mov_avg.export(filename = args.output_file)
     elif args.models == "kde":
-        kde = kde.KDE(dataset, args.time_window, args.crime_types, args.bandwidth)
+        kde = kde.KDE(dataset, args.time_window, args.crime_types, args.bandwidth, args.start_index,
+                      args.end_index)
         kde.export(filename = args.output_file)
     elif args.models == "log_reg":
         log_reg = logistic_regression.logistic_regression(dataset, args.penalty, args.reg_constant,
