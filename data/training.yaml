@@ -1,0 +1,205 @@
+# -*- coding: utf-8 -*-
+#include the following keywords in the experiment key in order to get
+#the correct model:
+#Moving Average: mov_avg
+#KDE: kde
+#logistic Regression: log_reg
+#NOTE: make the function keys the same as the function argument names
+
+input_file: "processed_data.obj"
+
+mov_avg_training_1:
+    crime_types: [2,3,4,5]
+    moving_window: 26
+    output_file: "results/mov_avg_26.csv"
+     
+mov_avg_training_2:
+    crime_types: [2,3,4,5]
+    moving_window: 52
+    output_file: "results/mov_avg_52.csv"
+
+mov_avg_training_3:
+    crime_types: [2,3,4,5]
+    moving_window: 104
+    output_file: "results/mov_avg_104.csv"
+    
+kde_1:
+   crime_types: [2, 3, 4, 5]
+   moving_window: 52
+   bandwidth: 400
+   start_index: 52
+   end_index: 104
+   output_file: "results/kde_400.csv"
+    
+kde_2:
+   crime_types: [2, 3, 4, 5]
+   moving_window: 52
+   bandwidth: 425
+   start_index: 52
+   end_index: 104
+   output_file: "results/kde_425.csv"
+
+kde_3:
+   crime_types: [2, 3, 4, 5]
+   moving_window: 52
+   bandwidth: 450
+   start_index: 52
+   end_index: 104
+   output_file: "results/kde_450.csv"
+
+kde_4:
+   crime_types: [2, 3, 4, 5]
+   moving_window: 52
+   bandwidth: 475
+   start_index: 52
+   end_index: 104
+   output_file: "results/kde_475.csv"
+
+kde_5:
+   crime_types: [2, 3, 4, 5]
+   moving_window: 52
+   bandwidth: 500
+   start_index: 52
+   end_index: 104
+   output_file: "results/kde_500.csv"
+
+kde_6:
+   crime_types: [2, 3, 4, 5]
+   moving_window: 52
+   bandwidth: 525
+   start_index: 52
+   end_index: 104
+   output_file: "results/kde_525.csv"
+
+log_reg_1:
+   penalty: 'l2'
+   reg_constant: 1.0
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_l2.csv"
+
+log_reg_2:
+   penalty: 'l1'
+   reg_constant: 1.0
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_l1.csv"
+
+log_reg_3:
+   penalty: 'l2'
+   reg_constant: 0.001
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_c_0.001.csv"
+
+log_reg_4:
+   penalty: 'l2'
+   reg_constant: 0.01
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_c_0.01.csv"
+
+log_reg_5:
+   penalty: 'l2'
+   reg_constant: 0.1
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_c_0.1.csv"
+
+log_reg_6:
+   penalty: 'l2'
+   reg_constant: 10
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_c_10.csv"
+
+log_reg_7:
+   penalty: 'l2'
+   reg_constant: 100
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_c_100.csv"
+
+log_reg_8:
+   penalty: 'l2'
+   reg_constant: 1000
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_c_1000.csv"
+
+log_reg_9:
+   penalty: 'l2'
+   reg_constant: 1.0
+   crime_types: []
+   lag_window: 8
+   start_index: 60
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_all_crime_types.csv"
+
+log_reg_10:
+   penalty: 'l2'
+   reg_constant: 1.0
+   crime_types: [2, 3, 4, 5]
+   lag_window: 16
+   start_index: 68
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_lag_16.csv"
+
+log_reg_11:
+   penalty: 'l2'
+   reg_constant: 1.0
+   crime_types: [2, 3, 4, 5]
+   lag_window: 4
+   start_index: 56
+   end_index: 104
+   time_window: 52
+   output_file: "results/log_reg_lag_4.csv"
+
+log_reg_12:
+   penalty: 'l2'
+   reg_constant: 1.0
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 34
+   end_index: 104
+   time_window: 26
+   output_file: "results/log_reg_train_26.csv"
+
+log_reg_13:
+   penalty: 'l2'
+   reg_constant: 1.0
+   crime_types: [2, 3, 4, 5]
+   lag_window: 8
+   start_index: 96
+   end_index: 104
+   time_window: 88
+   output_file: "results/log_reg_train_88.csv"
+
+
+    
