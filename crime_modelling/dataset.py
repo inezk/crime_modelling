@@ -2,9 +2,25 @@ import numpy as np
 import pickle
 
 #don't assume type_col included in feature_cols 
+"""
+This file contains the class for a SpatialDataSet object. The inputs are as follows:
+    
+out_file (required)- The name of the output file. The output file will be an .obj, to be managed with the 
+pickle package.
+id_col (required)- The column in the dataframe that contains the ids of each data entry.
+time_col (required)- Timestamp column
+coords_cols (required)- Two columns (x,y) that contains the coordinates of each data entry.
+feature_cols - Variable number of columns that contain any features for each data entry. 
+Each feature is a column.
+type_col (required) - The column that determines the crime type of each data entry. 
+date_format - String format of time_col
+uniform_areas - Whether the grid cells of the data points are uniform area.
+spatial_unit_areas - The area of the grid cells. If uniform_areas = True, then it will be an integer.
+Otherwise, it will be an array of integers.
+"""
 
 class SpatialDataSet(object):
-    def __init__(self, id_col, time_col, coords_cols, feature_cols, type_col, date_format = "%Y/%d/%m",
+    def __init__(self, out_file, id_col, time_col, coords_cols, feature_cols, type_col, date_format = "%Y/%d/%m",
                  uniform_areas = True, spatial_unit_areas = 250000):
         self.features = feature_cols #will probably change later
         (self.counts, self.ID, self.coords) = self.make_feature_frame(id_col, time_col, type_col, coords_cols)
@@ -13,7 +29,8 @@ class SpatialDataSet(object):
         self.view_frame = self.view(id_col, time_col, coords_cols, type_col, feature_cols) 
         self.uniform_areas = uniform_areas
         self.spatial_unit_areas = spatial_unit_areas
-
+        self.out_file = out_file
+    
     def make_feature_frame(self, id_col, time_col, type_col, coords_cols): #output is 3-d numpy array
         id_dict = dict() 
         id_row = 0
@@ -33,7 +50,7 @@ class SpatialDataSet(object):
                     counts_frame[i,j,:] = [unique_id[i], all_weeks[j]] + ([0] * len(unique_types))
                 else:
                     counts = [0] * len(unique_types)
-                    for k in range(0, len(unique_types)):
+                    for k in range(0, len(unique_types)): #saving unique counts to frame
                         if unique_types[k] not in unique:
                             counts[k] = 0
                         else: counts[k] = np.asscalar(counts_temp[np.where(unique == unique_types[k])])
@@ -57,7 +74,8 @@ class SpatialDataSet(object):
         return whole_frame
 
     def export(self): #save to csv file
-        file = open("processed_data.obj", "wb")
+        name = self.out_file + str(".obj")
+        file = open(name, "wb")
         pickle.dump(self, file)
         file.close()
 

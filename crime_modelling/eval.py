@@ -107,6 +107,8 @@ def main():
 
 
     # Order rows by prediction field
+    df["actual_count"] = pd.to_numeric(df["actual_count"], errors = 'coerce')
+    df["prediction"] = pd.to_numeric(df["prediction"], errors = 'coerce')
     df = df.sort_values(['prediction'], ascending=False)
 
     # Set resolution for area bins in evaluation graphics
@@ -134,7 +136,6 @@ def main():
 
     # Calculate num_predicted_MD field as cumulative sum of crimes predicted 
     # (moving from high-priority to low-priority sectors) for each date
-
     df['num_predicted_MD']= dfg['actual_count'].cumsum()
 
     # Calculate area_exposed field as cumulative sum of sector areas 

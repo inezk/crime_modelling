@@ -5,6 +5,12 @@ from datetime import timedelta
 import argparse
 
 #make sure doc is csv
+"""
+Preprocessing stage of data pipeline. More information is found in def main().
+example usage in command:
+
+python3 preprocessing.py  -input_file aprs_5years.csv -id_col 'Grid500ID' -time_col 'DATE_START' -coords_cols 'Grid500X', 'Grid500Y' -type_col 'HIERARCHY'
+"""
 
 #converts to nearest monday for week by week data
 def setup_time_frame(time_col):
@@ -14,16 +20,17 @@ def setup_time_frame(time_col):
     time_col = np.array(time_col).reshape(len(time_col), 1)
     return time_col
 
-def preprocess(file, id_col, time_col, coords_cols, feature_cols, type_col, date_format = "%Y/%d/%m",
+def preprocess(file, out_file, id_col, time_col, coords_cols, feature_cols, type_col, date_format = "%Y/%d/%m",
                uniform_areas = True, spatial_unit_areas = 250000):
     crime = pd.read_csv(file)
-    id_frame = np.array(crime[id_col])
-    time_frame = setup_time_frame(crime[time_col])
-    coord_frame = np.array(crime[coords_cols])
-    if feature_cols != "": feature_frame = np.array(crime[feature_cols])
+    id_frame = crime[id_col].values
+    if date_format == "%Y/%d/%m": time_frame = setup_time_frame(crime[time_col])
+    else: time_frame = crime[time_col].values
+    coord_frame = crime[coords_cols].values
+    if feature_cols != "": feature_frame = crime[feature_cols].values
     else: feature_frame = ""
-    type_frame = np.array(crime[type_col])
-    dataset_obj = SpatialDataSet(id_frame, time_frame, coord_frame, feature_frame, 
+    type_frame = crime[type_col].values
+    dataset_obj = SpatialDataSet(out_file, id_frame, time_frame, coord_frame, feature_frame, 
         type_frame, date_format, uniform_areas, spatial_unit_areas)
     return dataset_obj
 
@@ -33,7 +40,7 @@ def main():
                                      "class SpatialDataSet to use in the prediction module. NOTE: The prediction" + 
                                      "module is designed to specifically work with the SpatialDataSet class, so this"+
                                      "step is necessary before moving on to later modules. The output of this module" +
-                                     "will be an hdf5 file containing the SpatialDataSet object.\n\n"
+                                     "will be an object file containing the SpatialDataSet object.\n\n"
                                      "Input file should be comma-delimited with the following columns:\n\n"+
                                      "id_col - Column that provides the spatial ID coordinates of each data point.\n\n"+
                                      "time_col - Column that provides date and time of data point.\n\n" + 
@@ -47,6 +54,7 @@ def main():
                                      "should correspond to the rows of the input file.", formatter_class=argparse.RawTextHelpFormatter)
     required = parser.add_argument_group('required arguments')
     required.add_argument("-input_file", help = "Name of file containing data points")
+    required.add_argument("-output_file", help = "Name of output file")
     required.add_argument("-id_col", nargs = 1, help = "Spatial ID Column")
     required.add_argument("-time_col",nargs = 1, help = "Time Events Column")
     required.add_argument("-coords_cols", nargs = 2, help = "Coordinate Columns: First column is X, second Y")
@@ -83,7 +91,7 @@ def main():
         print("uniform_areas set to False but spatial_unit_areas is an integer. Set uniform_areas = True or provider an array of integers.")
         return
     
-    file = preprocess(args.input_file, args.id_col, args.time_col, args.coords_cols, args.feature_cols,
+    file = preprocess(args.input_file,args.output_file,  args.id_col, args.time_col, args.coords_cols, args.feature_cols,
                       args.type_col, args.date_format, args.uniform_areas, args.spatial_unit_areas)
     return file.export()
     
@@ -91,8 +99,4 @@ if __name__ == "__main__":
     main()
 
 
-#note: all args need to be in the form of arrays
-#preprocess("aprs_5years.csv", ["Grid500ID"], ["DATE_START"], ["Grid500X", "Grid500Y"],
-#["ARREST_FLAG", "VICTIMS", "SUSPECTS"], ["HIERARCHY"])
-#example usage:
-   # python3 preprocessing.py  -input_file aprs_5years.csv -id_col 'Grid500ID' -time_col 'DATE_START' -coords_cols 'Grid500X', 'Grid500Y' -type_col 'HIERARCHY'
+
