@@ -36,6 +36,12 @@ for key in temp:
                                                           fun_args.crime_types, fun_args.lag_window,
                                                           fun_args.start_index, fun_args.end_index, 
                                                           fun_args.time_window)
+    elif 'mohler' in key:
+       obj = hawkes_process.hawkes_process(dataset, out_file, fun_args.time_window, 
+                                           fun_args.fixed_bandwidth,
+                                               fun_args.bandwidth, fun_args.u_k, fun_args.v_k,
+                                               fun_args.start_index, fun_args.end_index,
+                                                fun_args.crime_types))
     obj.export()
     print("Outputted: " + str(out_file))
     
